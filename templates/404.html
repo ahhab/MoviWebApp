@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | MoviWebApp</title>
+    <!-- Google Fonts for a fun, retro feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Basic styles for the page */
+        body {
+            background-color: #1a1a1a; /* Dark gray background */
+            color: #f0f0f0; /* Light gray text */
+            font-family: 'Inter', sans-serif; /* A clean, readable font */
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* The main content container */
+        .container {
+            position: relative; /* Ensures this is on top of the background SVG */
+            z-index: 2;
+            max-width: 600px;
+        }
+
+        /* The background trash can icon */
+        .background-svg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60%;
+            height: 60%;
+            max-width: 400px;
+            max-height: 400px;
+            transform: translate(-50%, -50%);
+            color: #333; /* Darker gray for the SVG */
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+        /* Large "404" heading with the pixelated font */
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 5rem;
+            color: #fca311; /* A nice orange color */
+            margin: 0;
+        }
+
+        /* Subheading */
+        h2 {
+            font-size: 1.75rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* The message box with the thank you note */
+        .message-box {
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid #444;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+
+        /* Links within the message box and the main link */
+        a {
+            color: #fca311;
+            font-weight: bold;
+        }
+        
+        /* The main button to go back home */
+        .home-button {
+            display: inline-block;
+            margin-top: 2.5rem;
+            background-color: #fca311;
+            color: #1a1a1a;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+
+        .home-button:hover {
+            background-color: #e8920a;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background SVG Icon -->
+    <div class="background-svg">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.09-2.134H8.09a2.09 2.09 0 00-2.09 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+        </svg>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>404</h1>
+        <h2>This Page is in the Trash</h2>
+        <p>Looks like the page you wanted was thrown out with last night's popcorn. It's probably for the best.</p>
+
+        <div class="message-box">
+            <p>
+                This whole <strong>MoviWebApp</strong> is an educational project, and sometimes we delete things. A lot.
+                But we learned how to build this awesome 404 page (and much more) thanks to the incredible courses over at 
+                <a href="https://masterschool.com" target="_blank" rel="noopener noreferrer">masterschool.com</a>!
+            </p>
+        </div>
+
+        <a href="{{ url_for('home') }}" class="home-button">Go Back to Homepage</a>
+    </div>
+</body>
+</html>
