@@ -26,7 +26,7 @@ def add_user():
 
 @app.route('/users/<int:user_id>')
 def user_movies(user_id):
-    user = User.query.get(user_id)
+    user = User.query.get_or_404(user_id)
     movies = data_manager.get_user_movies(user_id)
     return render_template('movies.html', movies=movies, user=user)
 
@@ -41,19 +41,22 @@ def add_movie(user_id):
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/update', methods=['GET', 'POST'])
 def update_movie(user_id, movie_id):
+    movie = Movie.query.get_or_404(movie_id)
     if request.method == 'POST':
         new_title = request.form.get("new_title")
         if new_title:
             data_manager.update_movie(movie_id, new_title)
         return redirect(url_for('user_movies', user_id=user_id))
-    else:
-        movie = Movie.query.get(movie_id)
-        return render_template('update_movie.html', movie=movie)
+    return render_template('update_movie.html', movie=movie)
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/delete', methods=['POST'])
 def delete_movie(user_id, movie_id):
     data_manager.delete_movie(movie_id)
     return redirect(url_for('user_movies', user_id=user_id))
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
