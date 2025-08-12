@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from data_manager import DataManager
-from models import db, User
+from models import db, User, Movie
 import movies as movie_commands
 
 app = Flask(__name__)
@@ -37,6 +37,22 @@ def add_movie(user_id):
         movie_data = movie_commands.get_movie_data(movie_title)
         if movie_data:
             data_manager.add_movie(user_id, movie_data)
+    return redirect(url_for('user_movies', user_id=user_id))
+
+@app.route('/users/<int:user_id>/movies/<int:movie_id>/update', methods=['GET', 'POST'])
+def update_movie(user_id, movie_id):
+    if request.method == 'POST':
+        new_title = request.form.get("new_title")
+        if new_title:
+            data_manager.update_movie(movie_id, new_title)
+        return redirect(url_for('user_movies', user_id=user_id))
+    else:
+        movie = Movie.query.get(movie_id)
+        return render_template('update_movie.html', movie=movie)
+
+@app.route('/users/<int:user_id>/movies/<int:movie_id>/delete', methods=['POST'])
+def delete_movie(user_id, movie_id):
+    data_manager.delete_movie(movie_id)
     return redirect(url_for('user_movies', user_id=user_id))
 
 if __name__ == '__main__':

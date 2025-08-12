@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Update Movie{% endblock %}
+
+{% block content %}
+    <h2>Update Movie</h2>
+    <form action="{{ url_for('update_movie', user_id=movie.user_id, movie_id=movie.id) }}" method="post">
+        <input type="text" name="new_title" value="{{ movie.title }}">
+        <button type="submit">Update</button>
+    </form>
+{% endblock %}
