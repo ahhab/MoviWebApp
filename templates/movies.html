@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.name }}'s Movies{% endblock %}
+
+{% block content %}
+    <h2>{{ user.name }}'s Movies</h2>
+    <ul class="movie-grid">
+        {% for movie in movies %}
+            <li>
+                <div class="movie">
+                    <img class="movie-poster" src="{{ movie.poster_image_url }}" title="{{ movie.title }}">
+                    <div class="movie-title">{{ movie.title }}</div>
+                    <div class="movie-year">{{ movie.year }}</div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h3>Add a new movie</h3>
+    <form action="{{ url_for('add_movie', user_id=user.id) }}" method="post">
+        <input type="text" name="movie_title" placeholder="Movie Title">
+        <button type="submit">Add Movie</button>
+    </form>
+{% endblock %}

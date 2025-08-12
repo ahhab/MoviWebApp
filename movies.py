@@ -9,6 +9,36 @@ import re
 # Load environment variables from .env file
 load_dotenv()
 
+def get_movie_data(movie_title):
+    """Fetches movie data from OMDb API."""
+    api_key = os.getenv("OMDB_API_KEY")
+    if not api_key:
+        print("Error: OMDB_API_KEY not found. Please set it in your .env file.")
+        return None
+
+    url = f"http://www.omdbapi.com/?t={movie_title}&apikey={api_key}"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        movie_data = response.json()
+
+        if movie_data.get("Response") == "True":
+            return {
+                "title": movie_data["Title"],
+                "year": int(''.join(filter(str.isdigit, movie_data["Year"]))[:4]),
+                "director": movie_data["Director"],
+                "poster_image_url": movie_data["Poster"]
+            }
+        else:
+            print(f"Error: Movie '{movie_title}' not found on OMDb.")
+            return None
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error connecting to OMDb API: {e}")
+        return None
+    except (KeyError, ValueError) as e:
+        print(f"Error parsing movie data: {e}")
+        return None
 
 def command_list_movies():
     """Retrieve and display all movies from the database."""
@@ -29,38 +59,17 @@ def command_add_movie(movie_title=None):
     if movie_title is None:
         movie_title = input("Enter movie title: ")
 
-    api_key = os.getenv("OMDB_API_KEY")
-    if not api_key:
-        print("Error: OMDB_API_KEY not found. "
-              "Please set it in your .env file.")
-        return False
-
-    url = f"http://www.omdbapi.com/?t={movie_title}&apikey={api_key}"
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        movie_data = response.json()
-
-        if movie_data.get("Response") == "True":
-            title = movie_data["Title"]
-            year_str = movie_data["Year"]
-            year = int(''.join(filter(str.isdigit, year_str))[:4])
-            rating = float(movie_data["imdbRating"])
-            poster_url = movie_data["Poster"]
-
-            storage.add_movie(title, year, rating, poster_url)
-            print(f"Movie '{title}' successfully added.")
-            return True
-        else:
-            print(f"Error: Movie '{movie_title}' not found on OMDb.")
-            return False
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error connecting to OMDb API: {e}")
-        return False
-    except (KeyError, ValueError) as e:
-        print(f"Error parsing movie data: {e}")
-        return False
+    movie_data = get_movie_data(movie_title)
+    if movie_data:
+        storage.add_movie(
+            movie_data['title'],
+            movie_data['year'],
+            0,  # Default rating, as OMDb API does not provide it
+            movie_data['poster_image_url']
+        )
+        print(f"Movie '{movie_data['title']}' successfully added.")
+        return True
+    return False
 
 
 def command_delete_movie():

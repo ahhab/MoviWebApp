@@ -1,61 +1,43 @@
-from flask import Flask, render_template_string, request, redirect, send_from_directory
-import os
+from flask import Flask, render_template, request, redirect, url_for
+from data_manager import DataManager
+from models import db, User
 import movies as movie_commands
-import movie_storage_sql as storage
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///movies.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
+data_manager = DataManager()
 
-# --- Dynamic Website Generation ---
-def generate_movie_grid(movies):
-    """Generates the HTML for the movie grid."""
-    grid_html = ""
-    for movie in movies:
-        grid_html += f"""
-        <li>
-            <div class="movie">
-                <img class="movie-poster" src="{movie['poster_image_url']}"
-                     title="{movie['title']}">
-                <div class="movie-title">{movie['title']}</div>
-                <div class="movie-year">{movie['year']}</div>
-            </div>
-        </li>
-        """
-    return grid_html
+with app.app_context():
+    db.create_all()
 
 @app.route('/')
-def serve_index():
-    """Dynamically generates and serves the index.html page."""
-    storage.setup_database()  # Ensure the database is ready
-    movies = storage.list_movies()
-    movie_grid_html = generate_movie_grid(movies)
+def home():
+    users = data_manager.get_users()
+    return render_template('index.html', users=users)
 
-    try:
-        with open("_static/index_template.html", "r") as f:
-            template_html = f.read()
-    except FileNotFoundError:
-        return "Error: Template file not found.", 500
+@app.route('/users', methods=['POST'])
+def add_user():
+    user_name = request.form.get("user_name")
+    if user_name:
+        data_manager.add_user(user_name)
+    return redirect(url_for('home'))
 
-    website_html = template_html.replace("__TEMPLATE_TITLE__", "My Movie App")
-    website_html = website_html.replace(
-        "__TEMPLATE_MOVIE_GRID__", movie_grid_html)
+@app.route('/users/<int:user_id>')
+def user_movies(user_id):
+    user = User.query.get(user_id)
+    movies = data_manager.get_user_movies(user_id)
+    return render_template('movies.html', movies=movies, user=user)
 
-    return website_html
-
-# --- Static File Serving ---
-@app.route('/style.css')
-def serve_css():
-    """Serves the style.css file."""
-    return send_from_directory('_static', 'style.css')
-
-# --- API Routes ---
-@app.route('/add', methods=['POST'])
-def add_movie_from_web():
-    """Adds a movie from the web form."""
+@app.route('/users/<int:user_id>/add_movie', methods=['POST'])
+def add_movie(user_id):
     movie_title = request.form.get("movie_title")
     if movie_title:
-        movie_commands.command_add_movie(movie_title=movie_title)
-    return redirect('/')
-
+        movie_data = movie_commands.get_movie_data(movie_title)
+        if movie_data:
+            data_manager.add_movie(user_id, movie_data)
+    return redirect(url_for('user_movies', user_id=user_id))
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8080, debug=True)
