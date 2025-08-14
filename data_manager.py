@@ -1,5 +1,6 @@
 from models import db, User, Movie
 
+
 class DataManager:
     def get_users(self):
         return User.query.all()
