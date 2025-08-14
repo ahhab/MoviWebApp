@@ -9,6 +9,7 @@ import re
 # Load environment variables from .env file
 load_dotenv()
 
+
 def get_movie_data(movie_title):
     """Fetches movie data from OMDb API."""
     api_key = os.getenv("OMDB_API_KEY")
@@ -39,6 +40,7 @@ def get_movie_data(movie_title):
     except (KeyError, ValueError) as e:
         print(f"Error parsing movie data: {e}")
         return None
+
 
 def command_list_movies():
     """Retrieve and display all movies from the database."""
